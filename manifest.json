@@ -1,0 +1,15 @@
+{
+  "name": "YANAR – Student Network",
+  "short_name": "YANAR",
+  "description": "Your Academic Network & Resource – Anna University",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#6c63ff",
+  "orientation": "portrait-primary",
+  "categories": ["education", "social"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
