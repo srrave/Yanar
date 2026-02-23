@@ -465,9 +465,13 @@ let realtimeChannel = null;
 // BOOT
 // ============================================================
 window.onload = async () => {
-  initSupabase('https://sjvmdrgflfdlgkajaejr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdm1kcmdmbGZkbGdrYWphZWpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NjcyMzksImV4cCI6MjA4NzI0MzIzOX0.Qt9qmEPc9PrEdV1vPR5LsaDe6fSpP6wQKlvBw4FNUb0');
+  initSupabase(
+    'https://sjvmdrgflfdlgkajaejr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdm1kcmdmbGZkbGdrYWphZWpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NjcyMzksImV4cCI6MjA4NzI0MzIzOX0.Qt9qmEPc9PrEdV1vPR5LsaDe6fSpP6wQKlvBw4FNUb0'
+  );
   await checkSession();
 };
+
 async function checkSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
