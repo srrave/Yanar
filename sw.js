@@ -1,33 +1,39 @@
-const CACHE = 'yanar-v2';
-const STATIC = ['/', '/index.html'];
+const CACHE = 'yanar-v3';
+const STATIC = ['/index.html'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC).catch(()=>{})));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
-  // Network first for API calls, cache first for assets
-  if (e.request.url.includes('supabase.co')) {
-    e.respondWith(fetch(e.request).catch(() => new Response('offline', { status: 503 })));
+  // Skip Supabase API calls entirely - never cache these
+  if (e.request.url.includes('supabase.co') || 
+      e.request.url.includes('supabase-js') ||
+      e.request.method !== 'GET') {
     return;
   }
+  
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
       return fetch(e.request).then(res => {
+        // Only cache same-origin static assets
         if (res && res.status === 200 && res.type === 'basic') {
-          caches.open(CACHE).then(c => c.put(e.request, res.clone()));
+          const cloned = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, cloned));
         }
         return res;
-      }).catch(() => cached);
+      }).catch(() => cached || new Response('Offline', {status: 503}));
     })
   );
 });
