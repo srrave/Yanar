@@ -198,6 +198,22 @@ textarea.create-input{resize:none;height:100px;line-height:1.6}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--accent);color:var(--text);padding:10px 20px;border-radius:50px;font-size:.85rem;z-index:500;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 
+/* THEMES */
+body.theme-light{--bg:#f5f5f7;--bg2:#ffffff;--bg3:#eeeef3;--card:#ffffff;--border:#d1d1db;--text:#0a0a0f;--text2:#555570;--text3:#9999b3}
+body.theme-blue{--bg:#080c18;--bg2:#0d1225;--bg3:#121830;--card:#0f1520;--border:#1e2a45;--accent:#4a9eff;--accent2:#ff6b6b}
+body.theme-green{--bg:#060f09;--bg2:#0a1a0d;--bg3:#0f2414;--card:#0c1c10;--border:#1a3520;--accent:#2ecc71;--accent2:#f39c12}
+body.theme-amoled{--bg:#000000;--bg2:#050505;--bg3:#0a0a0a;--card:#080808;--border:#1a1a1a;--accent:#bb86fc;--accent2:#cf6679}
+body.theme-orange{--bg:#0f0a06;--bg2:#1a1008;--bg3:#22160a;--card:#1c1208;--border:#3a2510;--accent:#ff8c42;--accent2:#ff6584;--accent3:#ffd166}
+
+/* THEME PICKER */
+.theme-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center}
+.theme-box{width:100%;max-width:520px;background:var(--card);border-radius:24px 24px 0 0;border:1px solid var(--border);padding:24px;padding-bottom:40px}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.theme-btn{padding:14px 8px;border-radius:12px;border:2px solid var(--border);cursor:pointer;text-align:center;font-size:.8rem;font-weight:600;transition:.2s;font-family:'Syne',sans-serif}
+.theme-btn:hover{transform:translateY(-2px)}
+.theme-btn.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)44}
+.theme-swatch{width:32px;height:32px;border-radius:50%;margin:0 auto 8px;border:2px solid rgba(255,255,255,.2)}
+
 @media(max-width:768px){.sidebar{display:none}.main-layout{padding:12px;gap:0}}
 </style>
 </head>
@@ -214,7 +230,7 @@ textarea.create-input{resize:none;height:100px;line-height:1.6}
     <button class="btn-primary" onclick="saveSupabaseConfig()" style="margin-bottom:16px">Connect & Launch YANAR</button>
     <div class="setup-note">
       <strong>How to get these:</strong><br/>
-      1. Go to <a href="https://supabase.com" target="_blank">supabase.com</a> → New Project (free)<br/>
+      1. Go to <a href="https://sb.com" target="_blank">sb.com</a> → New Project (free)<br/>
       2. Settings → API → copy <em>Project URL</em> and <em>anon public</em> key<br/>
       3. Run the SQL from <code>supabase-setup.sql</code> in the SQL Editor<br/>
       4. Paste them above and click Connect!
@@ -273,6 +289,18 @@ textarea.create-input{resize:none;height:100px;line-height:1.6}
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
       Filter
     </button>
+    <button class="filter-btn" id="sort-btn-recent" onclick="setSort('recent')" style="border-color:var(--accent);color:var(--accent)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Recent
+    </button>
+    <button class="filter-btn" id="sort-btn-popular">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Popular
+    </button>
+    <button class="filter-btn" onclick="showThemePicker()" title="Change Theme">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M12 6a6 6 0 0 1 0 12"/></svg>
+      Theme
+    </button>
     <div id="active-filter-chips"></div>
   </div>
 
@@ -298,6 +326,8 @@ textarea.create-input{resize:none;height:100px;line-height:1.6}
           <button onclick="filterByType('question')" style="background:none;border:none;color:var(--text2);font-size:.85rem;text-align:left;cursor:pointer">❓ Questions</button>
           <button onclick="filterByType('opportunity')" style="background:none;border:none;color:var(--text2);font-size:.85rem;text-align:left;cursor:pointer">🚀 Opportunities</button>
           <button onclick="filterByType('resource')" style="background:none;border:none;color:var(--text2);font-size:.85rem;text-align:left;cursor:pointer">📚 Resources</button>
+          <button onclick="showThemePicker()" style="background:none;border:none;color:var(--text2);font-size:.85rem;text-align:left;cursor:pointer">🎨 Change Theme</button>
+          <button onclick="showPage('profile')" style="background:none;border:none;color:var(--text2);font-size:.85rem;text-align:left;cursor:pointer">👤 My Profile</button>
           <button onclick="doLogout()" style="background:none;border:none;color:var(--accent2);font-size:.85rem;text-align:left;cursor:pointer">🚪 Logout</button>
         </div>
       </div>
@@ -317,7 +347,10 @@ textarea.create-input{resize:none;height:100px;line-height:1.6}
       </div>
     </div>
     <div id="profile-posts"></div>
-    <button onclick="showPage('feed')" style="margin-top:16px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:10px 20px;border-radius:10px;width:100%;cursor:pointer">← Back to Feed</button>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button onclick="showPage('feed')" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:10px 20px;border-radius:10px;cursor:pointer">← Back to Feed</button>
+      <button onclick="doLogout()" style="flex:1;background:#ff658422;border:1px solid var(--accent2);color:var(--accent2);padding:10px 20px;border-radius:10px;cursor:pointer;font-weight:600">🚪 Logout</button>
+    </div>
   </div>
 
   <button class="fab" onclick="showCreateModal()">
@@ -332,10 +365,10 @@ textarea.create-input{resize:none;height:100px;line-height:1.6}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Q&A
     </button>
     <button class="nav-item" id="nav-opportunities" onclick="filterByType('opportunity')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Jobs
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Opps
     </button>
-    <button class="nav-item" id="nav-profile" onclick="showPage('profile')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+    <button class="nav-item" id="nav-resources" onclick="filterByType('resource')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Resources
     </button>
   </nav>
 </div>
@@ -400,6 +433,40 @@ textarea.create-input{resize:none;height:100px;line-height:1.6}
 
 <div class="toast" id="toast"></div>
 
+<!-- THEME PICKER MODAL -->
+<div id="theme-modal" style="display:none" class="theme-modal" onclick="if(event.target===this)closeThemePicker()">
+  <div class="theme-box">
+    <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px"></div>
+    <div style="font-size:1.1rem;font-weight:700;font-family:'Syne',sans-serif">🎨 Choose Theme</div>
+    <div class="theme-grid" id="theme-grid">
+      <button class="theme-btn active" onclick="applyTheme('default')" id="theme-default">
+        <div class="theme-swatch" style="background:linear-gradient(135deg,#6c63ff,#ff6584)"></div>
+        Dark Purple
+      </button>
+      <button class="theme-btn" onclick="applyTheme('light')" id="theme-light">
+        <div class="theme-swatch" style="background:linear-gradient(135deg,#f5f5f7,#6c63ff)"></div>
+        Light
+      </button>
+      <button class="theme-btn" onclick="applyTheme('blue')" id="theme-blue">
+        <div class="theme-swatch" style="background:linear-gradient(135deg,#080c18,#4a9eff)"></div>
+        Deep Blue
+      </button>
+      <button class="theme-btn" onclick="applyTheme('green')" id="theme-green">
+        <div class="theme-swatch" style="background:linear-gradient(135deg,#060f09,#2ecc71)"></div>
+        Forest Green
+      </button>
+      <button class="theme-btn" onclick="applyTheme('amoled')" id="theme-amoled">
+        <div class="theme-swatch" style="background:linear-gradient(135deg,#000,#bb86fc)"></div>
+        AMOLED Black
+      </button>
+      <button class="theme-btn" onclick="applyTheme('orange')" id="theme-orange">
+        <div class="theme-swatch" style="background:linear-gradient(135deg,#0f0a06,#ff8c42)"></div>
+        Sunset Orange
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // UNIVERSITIES DATA
@@ -428,10 +495,10 @@ const UNIVERSITIES = {
 // ============================================================
 // SUPABASE CLIENT
 // ============================================================
-let supabase = null;
+let sb = null;
 
 function initSupabase(url, key) {
-  supabase = window.supabase.createClient(url, key);
+  sb = window.supabase.createClient(url, key);
 }
 
 function getSavedConfig() {
@@ -459,6 +526,7 @@ let newPostType = 'info';
 let uploadedFiles = [];
 let currentPage = 'feed';
 let searchTimer = null;
+let currentSort = 'recent'; // 'recent' | 'popular'
 let realtimeChannel = null;
 
 // ============================================================
@@ -473,9 +541,9 @@ window.onload = async () => {
 };
 
 async function checkSession() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   if (session) {
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
     currentUser = profile || { id: session.user.id, username: session.user.email };
     initApp();
   } else {
@@ -495,6 +563,7 @@ function initApp() {
   const savedFilter = JSON.parse(localStorage.getItem('yanar_filter_' + currentUser.id) || '{}');
   currentFilter = savedFilter;
 
+  loadSavedTheme();
   renderFilterChips();
   loadFeed();
   loadSidebarStats();
@@ -521,10 +590,10 @@ async function doLogin() {
   btn.disabled = true; btn.textContent = 'Signing in…';
 
   // Look up email by username
-  const { data: profile, error: pe } = await supabase.from('profiles').select('email').eq('username', username).single();
+  const { data: profile, error: pe } = await sb.from('profiles').select('email').eq('username', username).single();
   if (pe || !profile) { errEl.textContent = 'Username not found'; btn.disabled=false; btn.textContent='Sign In'; return; }
 
-  const { error } = await supabase.auth.signInWithPassword({ email: profile.email, password });
+  const { error } = await sb.auth.signInWithPassword({ email: profile.email, password });
   if (error) { errEl.textContent = error.message; btn.disabled=false; btn.textContent='Sign In'; return; }
   await checkSession();
 }
@@ -549,14 +618,19 @@ async function doRegister() {
   btn.disabled = true; btn.textContent = 'Creating account…';
 
   // Check username taken
-  const { data: existing } = await supabase.from('profiles').select('id').eq('username', username).single();
+  const { data: existing } = await sb.from('profiles').select('id').eq('username', username).single();
   if (existing) { errEl.textContent = 'Username already taken'; btn.disabled=false; btn.textContent='Create Account'; return; }
 
-  const fakeEmail = `${username}@yanar.app`;
-  const { data: authData, error: authErr } = await supabase.auth.signUp({ email: fakeEmail, password });
+  const fakeEmail = `${username}@student.yanar.edu.in`;
+  const { data: authData, error: authErr } = await sb.auth.signUp({ 
+    email: fakeEmail, 
+    password,
+    options: { data: { username, display_name: name || username } }
+  });
   if (authErr) { errEl.textContent = authErr.message; btn.disabled=false; btn.textContent='Create Account'; return; }
+  if (!authData.user) { errEl.textContent = 'Registration failed. Please try again.'; btn.disabled=false; btn.textContent='Create Account'; return; }
 
-  const { error: profileErr } = await supabase.from('profiles').upsert({
+  const { error: profileErr } = await sb.from('profiles').upsert({
     id: authData.user.id, username, email: fakeEmail,
     display_name: name || username, university, college, branch, year,
     created_at: new Date().toISOString()
@@ -567,9 +641,9 @@ async function doRegister() {
 }
 
 async function doLogout() {
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
   currentUser = null;
-  if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+  if (realtimeChannel) sb.removeChannel(realtimeChannel);
   document.getElementById('app').style.display = 'none';
   document.getElementById('auth-screen').style.display = 'flex';
 }
@@ -580,7 +654,7 @@ async function doLogout() {
 async function loadFeed() {
   document.getElementById('feed-container').innerHTML = '<div class="loading"><div class="spinner"></div> Loading…</div>';
   
-  let query = supabase.from('posts')
+  let query = sb.from('posts')
     .select(`*, profiles(username, display_name, college, university, branch), likes(user_id), comments(id)`)
     .order('created_at', { ascending: false })
     .limit(50);
@@ -588,16 +662,35 @@ async function loadFeed() {
   if (activeFilterType) query = query.eq('type', activeFilterType);
   if (searchQuery) query = query.or(`title.ilike.%${searchQuery}%,body.ilike.%${searchQuery}%`);
 
-  // Academic filter
-  if (currentFilter.university) query = query.or(`target_university.eq.${currentFilter.university},target_university.is.null`);
-  if (currentFilter.college) query = query.or(`target_college.eq.${currentFilter.college},target_college.is.null`);
-  if (currentFilter.branch) query = query.or(`target_branch.eq.${currentFilter.branch},target_branch.is.null`);
-  if (currentFilter.year) query = query.or(`target_year.eq.${currentFilter.year},target_year.is.null`);
+  // Academic filter - show post if post's target matches user's filter OR post target is null (broadcast)
+  // Logic: user filter Anna Uni > UCE Trichy means show posts targeted to:
+  //   - null (everyone), OR Anna Uni only, OR Anna Uni > UCE Trichy (exact or broader)
+  if (currentFilter.university) {
+    query = query.or(`target_university.is.null,target_university.eq.${currentFilter.university}`);
+  }
+  if (currentFilter.college) {
+    // Show posts targeted to: no college (null), OR exact same college
+    query = query.or(`target_college.is.null,target_college.eq.${currentFilter.college}`);
+  }
+  if (currentFilter.branch) {
+    query = query.or(`target_branch.is.null,target_branch.eq.${currentFilter.branch}`);
+  }
+  if (currentFilter.year) {
+    query = query.or(`target_year.is.null,target_year.eq.${currentFilter.year}`);
+  }
 
   const { data: posts, error } = await query;
   if (error) { document.getElementById('feed-container').innerHTML = `<div class="empty-state"><h3>Error loading posts</h3><p>${error.message}</p></div>`; return; }
 
-  renderFeedPosts(posts || []);
+  let finalPosts = posts || [];
+  if (currentSort === 'popular') {
+    finalPosts = [...finalPosts].sort((a,b) => {
+      const scoreA = (a.likes||[]).length * 2 + (a.comments||[]).length;
+      const scoreB = (b.likes||[]).length * 2 + (b.comments||[]).length;
+      return scoreB - scoreA;
+    });
+  }
+  renderFeedPosts(finalPosts);
   loadSidebarStats();
 }
 
@@ -680,12 +773,12 @@ async function toggleLike(postId, currentlyLiked) {
   const btn = countEl?.parentElement;
 
   if (currentlyLiked) {
-    await supabase.from('likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+    await sb.from('likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
     if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
     btn?.classList.remove('liked');
     if (btn) btn.querySelector('svg').setAttribute('fill', 'none');
   } else {
-    await supabase.from('likes').insert({ post_id: postId, user_id: currentUser.id });
+    await sb.from('likes').insert({ post_id: postId, user_id: currentUser.id });
     if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
     btn?.classList.add('liked');
     if (btn) btn.querySelector('svg').setAttribute('fill', 'currentColor');
@@ -711,7 +804,7 @@ async function toggleComments(postId) {
 async function loadComments(postId) {
   const listEl = document.getElementById('comments-list-' + postId);
   if (!listEl) return;
-  const { data: comments } = await supabase.from('comments')
+  const { data: comments } = await sb.from('comments')
     .select('*, profiles(username, display_name), comment_likes(user_id)')
     .eq('post_id', postId)
     .is('parent_id', null)
@@ -721,7 +814,7 @@ async function loadComments(postId) {
   // Load replies
   if (topLevel.length === 0) { listEl.innerHTML = '<p style="color:var(--text3);font-size:.82rem;padding:8px 0">No comments yet. Be the first!</p>'; return; }
 
-  const { data: replies } = await supabase.from('comments')
+  const { data: replies } = await sb.from('comments')
     .select('*, profiles(username, display_name), comment_likes(user_id)')
     .eq('post_id', postId).not('parent_id', 'is', null).order('created_at', { ascending: true });
 
@@ -735,6 +828,7 @@ function renderComment(c, allReplies, postId) {
   const likeCount = (c.comment_likes || []).length;
   const liked = (c.comment_likes || []).some(l => l.user_id === currentUser?.id);
   const childReplies = allReplies.filter(r => r.parent_id === c.id);
+  const replyCount = childReplies.length;
 
   return `<div class="comment" id="comment-${c.id}">
     <div class="comment-avatar" style="background:${color}">${name.slice(0,2).toUpperCase()}</div>
@@ -742,18 +836,37 @@ function renderComment(c, allReplies, postId) {
       <span class="comment-author">${escHtml(name)}</span>
       <div class="comment-text">${escHtml(c.body)}</div>
       <div class="comment-actions">
-        <button class="comment-action" onclick="toggleCommentLike('${c.id}','${postId}',${liked})">❤️ ${likeCount}</button>
-        <button class="comment-action" onclick="toggleReplyInput('${c.id}','${postId}')">Reply</button>
+        <button class="comment-action ${liked?'liked-comment':''}" onclick="toggleCommentLike('${c.id}','${postId}',${liked})">❤️ ${likeCount}</button>
+        <button class="comment-action" onclick="toggleReplyInput('${c.id}','${postId}')">↩ Reply</button>
+        ${replyCount > 0 ? `<button class="comment-action" onclick="toggleNestedReplies('${c.id}')" id="replies-toggle-${c.id}">💬 ${replyCount} ${replyCount===1?'reply':'replies'} ▸</button>` : ''}
       </div>
-      ${childReplies.length ? `<div class="nested-comments">${childReplies.map(r => renderComment(r, [], postId)).join('')}</div>` : ''}
+      ${replyCount > 0 ? `
+        <div class="nested-comments" id="nested-${c.id}" style="display:none">
+          ${childReplies.map(r => renderComment(r, [], postId)).join('')}
+        </div>` : ''}
       <div id="reply-input-${c.id}" style="display:none">
         <div class="comment-input-row" style="margin-top:8px">
-          <input type="text" placeholder="Reply…" id="reply-text-${c.id}" onkeydown="if(event.key==='Enter')submitReply('${postId}','${c.id}')"/>
+          <input type="text" placeholder="Reply to ${escHtml(name)}…" id="reply-text-${c.id}" onkeydown="if(event.key==='Enter')submitReply('${postId}','${c.id}')"/>
           <button class="comment-send" onclick="submitReply('${postId}','${c.id}')">Reply</button>
         </div>
       </div>
     </div>
   </div>`;
+}
+
+function toggleNestedReplies(commentId) {
+  const nested = document.getElementById('nested-' + commentId);
+  const toggle = document.getElementById('replies-toggle-' + commentId);
+  if (!nested) return;
+  const isHidden = nested.style.display === 'none';
+  nested.style.display = isHidden ? 'block' : 'none';
+  if (toggle) {
+    const count = toggle.textContent.match(/\d+/)?.[0] || '';
+    const word = count === '1' ? 'reply' : 'replies';
+    toggle.textContent = isHidden
+      ? `💬 ${count} ${word} ▾`
+      : `💬 ${count} ${word} ▸`;
+  }
 }
 
 function toggleReplyInput(commentId, postId) {
@@ -766,7 +879,7 @@ async function submitComment(postId) {
   const body = input?.value?.trim();
   if (!body || !currentUser) return;
   input.value = '';
-  await supabase.from('comments').insert({ post_id: postId, user_id: currentUser.id, body, parent_id: null });
+  await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, body, parent_id: null });
   await loadComments(postId);
   // Update count
   const countEl = document.getElementById('comment-count-' + postId);
@@ -779,7 +892,7 @@ async function submitReply(postId, parentId) {
   const body = input?.value?.trim();
   if (!body || !currentUser) return;
   input.value = '';
-  await supabase.from('comments').insert({ post_id: postId, user_id: currentUser.id, body, parent_id: parentId });
+  await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, body, parent_id: parentId });
   await loadComments(postId);
   showToast('Reply posted!');
 }
@@ -787,9 +900,9 @@ async function submitReply(postId, parentId) {
 async function toggleCommentLike(commentId, postId, currentlyLiked) {
   if (!currentUser) return;
   if (currentlyLiked) {
-    await supabase.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', currentUser.id);
+    await sb.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', currentUser.id);
   } else {
-    await supabase.from('comment_likes').insert({ comment_id: commentId, user_id: currentUser.id });
+    await sb.from('comment_likes').insert({ comment_id: commentId, user_id: currentUser.id });
   }
   await loadComments(postId);
 }
@@ -824,9 +937,9 @@ async function handleFileUpload(event) {
     if (file.size > 5 * 1024 * 1024) { showToast(`${file.name} is too large (max 5MB)`); continue; }
     const ext = file.name.split('.').pop();
     const path = `uploads/${currentUser.id}/${Date.now()}_${file.name}`;
-    const { data, error } = await supabase.storage.from('yanar-files').upload(path, file);
+    const { data, error } = await sb.storage.from('yanar-files').upload(path, file);
     if (error) { showToast('Upload failed: ' + error.message); continue; }
-    const { data: { publicUrl } } = supabase.storage.from('yanar-files').getPublicUrl(path);
+    const { data: { publicUrl } } = sb.storage.from('yanar-files').getPublicUrl(path);
     uploadedFiles.push({ name: file.name, type: file.type.includes('pdf') ? 'pdf' : 'image', url: publicUrl });
     renderUploadedFiles();
     showToast(`${file.name} uploaded ✓`);
@@ -866,7 +979,7 @@ async function submitPost() {
 
   const tags = extractTags(title + ' ' + body);
 
-  const { error } = await supabase.from('posts').insert({
+  const { error } = await sb.from('posts').insert({
     user_id: currentUser.id,
     type: newPostType,
     title: title || null,
@@ -995,12 +1108,12 @@ function showPage(page) {
     mainLayout.style.display = 'flex'; profilePage.style.display = 'none';
     activeFilterType = '';
     document.getElementById('nav-feed').classList.add('active');
-    ['nav-questions','nav-opportunities','nav-profile'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+    ['nav-questions','nav-opportunities','nav-resources','nav-profile'].forEach(id => document.getElementById(id)?.classList.remove('active'));
     loadFeed();
   } else if (page === 'profile') {
     mainLayout.style.display = 'none'; profilePage.style.display = 'block';
     document.getElementById('nav-profile').classList.add('active');
-    ['nav-feed','nav-questions','nav-opportunities'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+    ['nav-feed','nav-questions','nav-opportunities','nav-resources'].forEach(id => document.getElementById(id)?.classList.remove('active'));
     loadProfilePage();
   }
 }
@@ -1008,8 +1121,8 @@ function showPage(page) {
 function filterByType(type) {
   activeFilterType = activeFilterType === type ? '' : type;
   showPage('feed');
-  const navMap = { question:'nav-questions', opportunity:'nav-opportunities' };
-  ['nav-feed','nav-questions','nav-opportunities'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  const navMap = { question:'nav-questions', opportunity:'nav-opportunities', resource:'nav-resources' };
+  ['nav-feed','nav-questions','nav-opportunities','nav-resources'].forEach(id => document.getElementById(id)?.classList.remove('active'));
   if (activeFilterType && navMap[activeFilterType]) document.getElementById(navMap[activeFilterType])?.classList.add('active');
   else document.getElementById('nav-feed')?.classList.add('active');
 }
@@ -1021,10 +1134,10 @@ async function loadProfilePage() {
   document.getElementById('profile-username-display').textContent = currentUser.display_name || currentUser.username;
   document.getElementById('profile-college-display').textContent = [currentUser.college, currentUser.branch, currentUser.year ? `Year ${currentUser.year}` : ''].filter(Boolean).join(' · ') || 'No college info';
 
-  const { data: posts } = await supabase.from('posts').select('*, likes(user_id), comments(id)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  const { data: posts } = await sb.from('posts').select('*, likes(user_id), comments(id)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
   const myPosts = posts || [];
   const totalLikes = myPosts.reduce((s, p) => s + (p.likes || []).length, 0);
-  const { count: commentCount } = await supabase.from('comments').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+  const { count: commentCount } = await sb.from('comments').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
 
   document.getElementById('ps-posts').textContent = myPosts.length;
   document.getElementById('ps-comments').textContent = commentCount || 0;
@@ -1036,16 +1149,16 @@ async function loadProfilePage() {
 
 async function loadSidebarStats() {
   if (!currentUser) return;
-  const { data: posts } = await supabase.from('posts').select('likes(user_id), comments(id)').eq('user_id', currentUser.id);
+  const { data: posts } = await sb.from('posts').select('likes(user_id), comments(id)').eq('user_id', currentUser.id);
   const myPosts = posts || [];
   document.getElementById('stat-posts').textContent = myPosts.length;
   document.getElementById('stat-likes').textContent = myPosts.reduce((s, p) => s + (p.likes || []).length, 0);
 
-  const { count } = await supabase.from('comments').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+  const { count } = await sb.from('comments').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
   document.getElementById('stat-comments').textContent = count || 0;
 
   // Trending tags
-  const { data: allPosts } = await supabase.from('posts').select('tags').limit(100);
+  const { data: allPosts } = await sb.from('posts').select('tags').limit(100);
   const tagCount = {};
   (allPosts || []).forEach(p => (p.tags || []).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; }));
   const topTags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 12);
@@ -1056,11 +1169,75 @@ async function loadSidebarStats() {
 // REAL-TIME
 // ============================================================
 function subscribeRealtime() {
-  realtimeChannel = supabase.channel('public:posts')
+  realtimeChannel = sb.channel('public:posts')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => {
       if (currentPage === 'feed') loadFeed();
     }).subscribe();
 }
+
+// ============================================================
+// SORT
+// ============================================================
+function setSort(type) {
+  currentSort = type;
+  // Update button styles
+  const btnRecent = document.getElementById('sort-btn-recent');
+  const btnPopular = document.getElementById('sort-btn-popular');
+  if (btnRecent && btnPopular) {
+    if (type === 'recent') {
+      btnRecent.style.borderColor = 'var(--accent)'; btnRecent.style.color = 'var(--accent)';
+      btnPopular.style.borderColor = 'var(--border)'; btnPopular.style.color = 'var(--text2)';
+    } else {
+      btnPopular.style.borderColor = 'var(--accent)'; btnPopular.style.color = 'var(--accent)';
+      btnRecent.style.borderColor = 'var(--border)'; btnRecent.style.color = 'var(--text2)';
+    }
+    // Wire up onclick for popular button
+    btnPopular.onclick = () => setSort('popular');
+  }
+  loadFeed();
+}
+
+// ============================================================
+// THEMES
+// ============================================================
+const THEMES = {
+  default: { name:'Dark Purple', class:'' },
+  light:   { name:'Light',       class:'theme-light' },
+  blue:    { name:'Deep Blue',   class:'theme-blue' },
+  green:   { name:'Forest Green',class:'theme-green' },
+  amoled:  { name:'AMOLED Black',class:'theme-amoled' },
+  orange:  { name:'Sunset Orange',class:'theme-orange' }
+};
+
+function applyTheme(themeKey) {
+  // Remove all theme classes
+  Object.values(THEMES).forEach(t => { if(t.class) document.body.classList.remove(t.class); });
+  // Apply new theme
+  if (THEMES[themeKey]?.class) document.body.classList.add(THEMES[themeKey].class);
+  // Save preference
+  localStorage.setItem('yanar_theme', themeKey);
+  // Update active button in picker
+  document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById('theme-' + themeKey);
+  if (activeBtn) activeBtn.classList.add('active');
+  closeThemePicker();
+  showToast('Theme changed to ' + THEMES[themeKey].name + '!');
+}
+
+function loadSavedTheme() {
+  const saved = localStorage.getItem('yanar_theme') || 'default';
+  applyTheme(saved);
+}
+
+function showThemePicker() {
+  document.getElementById('theme-modal').style.display = 'flex';
+  // Mark current active
+  const saved = localStorage.getItem('yanar_theme') || 'default';
+  document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById('theme-' + saved);
+  if (activeBtn) activeBtn.classList.add('active');
+}
+function closeThemePicker() { document.getElementById('theme-modal').style.display = 'none'; }
 
 // ============================================================
 // SEARCH
